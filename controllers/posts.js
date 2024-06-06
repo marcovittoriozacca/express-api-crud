@@ -84,9 +84,9 @@ const index = async (req, res, next) => {
     const totalPages = Math.ceil(totalItems / limit);
     const offset = (page - 1) * limit;
     try{
-        if(page > totalPages){
+        if(page > totalPages || page <= 0 || isNaN(page)){
             return res.status(404).json({
-                error: `Page number too big. the last page is the number: ${totalPages}`
+                error: `The page you're looking for doesn't exist: Here's the total amount of pages: ${totalPages}`
             });
         }
 
