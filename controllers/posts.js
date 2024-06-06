@@ -81,7 +81,24 @@ const index = async (req, res, next) => {
             },
             
         })
-        res.json(postsList)
+
+        let count = parseInt(postsList.length);
+        if(count === 0){
+            return res.status(404).json({
+                status:404,
+                success: false,
+                count, 
+                message: "No posts found"
+            })
+        } 
+
+        return res.status(200).json({
+            status:200,
+            success: true,
+            count, 
+            posts_list: postsList,
+        })
+
 
     }catch(err){
         next(err);
@@ -111,7 +128,9 @@ const update = async (req, res, next) => {
             data: data
         });
         res.json({
-            up: upPost
+            status:200,
+            success: true,
+            updated_post: upPost
         });
     }catch(err){
         next(err);
