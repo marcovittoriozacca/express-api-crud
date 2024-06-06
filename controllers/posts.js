@@ -54,6 +54,8 @@ const show = async (req, res, next) => {
 
 const index = async (req, res, next) => {
 
+    const { page = 1, limit = 10, available } = req.query;
+
     let { published, word } = req.query;
 
     if(published === 'true'){
@@ -64,22 +66,34 @@ const index = async (req, res, next) => {
         published = undefined
     }
 
-    try{
-        const postsList = await prisma.post.findMany({
-            where: {
-                AND: [
-                    {
-                        published: published,
-                    },
-                    {
-                        OR:[
-                            {title: {contains: word}},
-                            {content: {contains: word}}
-                        ],
-                    }
-                ]
+    let where = {
+        AND: [
+            {
+                published: published,
             },
-            
+            {
+                OR:[
+                    {title: {contains: word}},
+                    {content: {contains: word}}
+                ],
+            }
+        ]
+    }
+
+    const totalItems = await prisma.post.count({ where });
+    const totalPages = Math.ceil(totalItems / limit);
+    const offset = (page - 1) * limit;
+    try{
+        if(page > totalPages){
+            return res.status(404).json({
+                error: `Page number too big. the last page is the number: ${totalPages}`
+            });
+        }
+
+        const postsList = await prisma.post.findMany({
+            where,
+            take: parseInt(limit),
+            skip: offset,
         })
 
         let count = parseInt(postsList.length);
@@ -95,8 +109,10 @@ const index = async (req, res, next) => {
         return res.status(200).json({
             status:200,
             success: true,
-            count, 
-            posts_list: postsList,
+            postsList,
+            totalPages,
+            currentPage: parseInt(page),
+            totalItems
         })
 
 
