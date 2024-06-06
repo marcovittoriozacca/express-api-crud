@@ -133,7 +133,7 @@ const update = async (req, res, next) => {
     }
     if(data.id){
         const err = new Error('You cant edit the field: ID');
-        next(err);
+        return next(err);
     }
 
     try{
