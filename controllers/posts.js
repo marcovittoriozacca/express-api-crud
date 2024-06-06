@@ -24,6 +24,35 @@ const store = async (req, res, next) => {
 
 }
 
+const show = async (req, res, next) => {
+    const { slug } = req.params;
+
+    try{
+        const fPost = await prisma.post.findUnique({
+            where: {
+                slug: slug
+            }
+        })
+        if(!fPost){
+            return res.status(404).json({
+                status: 400,
+                success: false,
+                message: `No post with slug: ${slug} found.`
+            })
+        }
+        return res.status(200).json({
+        status: 200,
+        success: true,
+        post: fPost,
+    });
+    }catch(err){
+        next(err)
+    }
+
+
+}
+
 module.exports = {
     store,
+    show,
 }
