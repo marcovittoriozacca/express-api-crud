@@ -120,9 +120,32 @@ const update = async (req, res, next) => {
 
 }
 
+const destroy = async (req, res, next) => {
+    const { slug } = req.params;
+
+    try{
+        const dPost = await prisma.post.delete({
+            where: {
+                slug: slug
+            }
+        })
+    
+        return res.status(200).json({
+            status: 200,
+            success: true,
+            post_deleted: dPost,
+        });
+    }catch(err){
+        next(err);
+    }
+
+
+}
+
 module.exports = {
     store,
     show,
     index,
-    update
+    update,
+    destroy
 }
