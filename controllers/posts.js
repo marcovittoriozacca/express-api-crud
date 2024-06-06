@@ -67,11 +67,17 @@ const index = async (req, res, next) => {
     try{
         const postsList = await prisma.post.findMany({
             where: {
-                published: published,
-                OR:[
-                    {title: {contains: word}},
-                    {content: {contains: word}}
-                ],
+                AND: [
+                    {
+                        published: published,
+                    },
+                    {
+                        OR:[
+                            {title: {contains: word}},
+                            {content: {contains: word}}
+                        ],
+                    }
+                ]
             },
             
         })
