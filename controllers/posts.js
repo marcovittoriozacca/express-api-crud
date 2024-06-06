@@ -52,7 +52,39 @@ const show = async (req, res, next) => {
 
 }
 
+const index = async (req, res, next) => {
+
+    let { published, word } = req.query;
+
+    if(published === 'true'){
+        published = true;
+    }else if(published === 'false'){
+        published = false;
+    }else{
+        published = undefined
+    }
+
+    try{
+        const postsList = await prisma.post.findMany({
+            where: {
+                published: published,
+                OR:[
+                    {title: {contains: word}},
+                    {content: {contains: word}}
+                ],
+            },
+            
+        })
+        res.json(postsList)
+
+    }catch(err){
+        next(err);
+    }
+
+}
+
 module.exports = {
     store,
     show,
+    index
 }
